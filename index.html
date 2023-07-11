@@ -7,22 +7,129 @@
   <h1>CRUD de Vendas - Álbuns da Taylor Swift</h1>
 
   <form id="albumForm">
-    <input type="text" id="albumName" placeholder="Nome do Álbum" required>
-    <input type="number" id="albumPrice" placeholder="Preço" required>
-    <button type="submit">Adicionar Álbum</button>
+    <label for="albumName">Nome do Álbum:</label>
+    <input type="text" id="albumName" required><br>
+
+    <label for="albumPrice">Preço:</label>
+    <input type="number" id="albumPrice" required><br>
+
+    <label for="albumQuantity">Quantidade:</label>
+    <input type="number" id="albumQuantity" required><br>
+
+    <button type="submit">Adicionar</button>
   </form>
 
-  <table id="albumTable">
+  <table id="albumTable" border="1">
     <thead>
       <tr>
         <th>Nome do Álbum</th>
         <th>Preço</th>
+        <th>Quantidade</th>
         <th>Ações</th>
       </tr>
     </thead>
-    <tbody id="albumList"></tbody>
+    <tbody id="albumTableBody"></tbody>
   </table>
 
-  <script src="script.js"></script>
+  <script>
+    // Função para carregar os dados dos álbuns da API e exibir na tabela
+    function loadAlbums() {
+      fetch('https://649a1d4a79fbe9bcf8404b5a.mockapi.io/users/20201214010018/products')
+        .then(response => response.json())
+        .then(albums => {
+          const albumTableBody = document.getElementById('albumTableBody');
+          albumTableBody.innerHTML = '';
+
+          albums.forEach(album => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${album.albumName}</td>
+              <td>${album.albumPrice}</td>
+              <td>${album.albumQuantity}</td>
+              <td>
+                <button onclick="editAlbum(${album.id})">Editar</button>
+                <button onclick="deleteAlbum(${album.id})">Excluir</button>
+              </td>
+            `;
+            albumTableBody.appendChild(row);
+          });
+        });
+    }
+
+    // Função para adicionar um novo álbum
+    function addAlbum(event) {
+      event.preventDefault();
+
+      const albumNameInput = document.getElementById('albumName');
+      const albumPriceInput = document.getElementById('albumPrice');
+      const albumQuantityInput = document.getElementById('albumQuantity');
+
+      const album = {
+        albumName: albumNameInput.value,
+        albumPrice: parseFloat(albumPriceInput.value),
+        albumQuantity: parseInt(albumQuantityInput.value)
+      };
+
+      fetch('https://649a1d4a79fbe9bcf8404b5a.mockapi.io/users/20201214010018/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(album)
+      })
+        .then(response => response.json())
+        .then(() => {
+          albumNameInput.value = '';
+          albumPriceInput.value = '';
+          albumQuantityInput.value = '';
+          loadAlbums();
+        });
+    }
+
+    // Função para editar um álbum
+    function editAlbum(albumId) {
+      const albumName = prompt('Digite o novo nome do álbum:');
+      const albumPrice = parseFloat(prompt('Digite o novo preço do álbum:'));
+      const albumQuantity = parseInt(prompt('Digite a nova quantidade:'));
+
+      const album = {
+        albumName: albumName,
+        albumPrice: albumPrice,
+        albumQuantity: albumQuantity
+      };
+
+      fetch(`https://649a1d4a79fbe9bcf8404b5a.mockapi.io/users/20201214010018/products/${albumId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(album)
+      })
+        .then(response => response.json())
+        .then(() => {
+          loadAlbums();
+        });
+    }
+
+    // Função para excluir um álbum
+    function deleteAlbum(albumId) {
+      if (confirm('Tem certeza que deseja excluir o álbum?')) {
+        fetch(`https://649a1d4a79fbe9bcf8404b5a.mockapi.io/users/20201214010018/products/${albumId}`, {
+          method: 'DELETE'
+        })
+          .then(() => {
+            loadAlbums();
+          });
+      }
+    }
+
+    // Carregar os álbuns ao carregar a página
+    window.onload = function() {
+      const albumForm = document.getElementById('albumForm');
+      albumForm.addEventListener('submit', addAlbum);
+
+      loadAlbums();
+    };
+  </script>
 </body>
 </html>
