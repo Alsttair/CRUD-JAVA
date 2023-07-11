@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CRUD de Vendas - Álbuns da Taylor Swift</title>
+</head>
+<body>
+  <h1>CRUD de Vendas - Álbuns da Taylor Swift</h1>
+
+  <!-- Formulário para criar uma nova venda -->
+  <h2>Nova Venda</h2>
+  <form id="create-form">
+    <label for="album">Álbum:</label>
+    <input type="text" id="album" required>
+
+    <label for="quantity">Quantidade:</label>
+    <input type="number" id="quantity" required>
+
+    <button type="submit">Adicionar Venda</button>
+  </form>
+
+  <!-- Tabela para exibir as vendas -->
+  <h2>Vendas</h2>
+  <table id="sales-table">
+    <thead>
+      <tr>
+        <th>Álbum</th>
+        <th>Quantidade</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody id="sales-table-body">
+      <!-- Os registros das vendas serão inseridos aqui -->
+    </tbody>
+  </table>
+
+  <script>
+    // Array para armazenar as vendas
+    var sales = [];
+
+    // Função para atualizar a tabela de vendas
+    function updateSalesTable() {
+      var tableBody = document.getElementById("sales-table-body");
+      tableBody.innerHTML = "";
+
+      for (var i = 0; i < sales.length; i++) {
+        var sale = sales[i];
+
+        var row = document.createElement("tr");
+        var albumCell = document.createElement("td");
+        albumCell.textContent = sale.album;
+        row.appendChild(albumCell);
+
+        var quantityCell = document.createElement("td");
+        quantityCell.textContent = sale.quantity;
+        row.appendChild(quantityCell);
+
+        var actionsCell = document.createElement("td");
+        var deleteButton = document.createElement("button");
+        deleteButton.textContent = "Excluir";
+        deleteButton.setAttribute("data-index", i);
+        deleteButton.addEventListener("click", deleteSale);
+        actionsCell.appendChild(deleteButton);
+        row.appendChild(actionsCell);
+
+        tableBody.appendChild(row);
+      }
+    }
+
+    // Função para adicionar uma nova venda
+    function addSale(event) {
+      event.preventDefault();
+
+      var albumInput = document.getElementById("album");
+      var quantityInput = document.getElementById("quantity");
+
+      var sale = {
+        album: albumInput.value,
+        quantity: parseInt(quantityInput.value)
+      };
+
+      sales.push(sale);
+
+      albumInput.value = "";
+      quantityInput.value = "";
+
+      updateSalesTable();
+    }
+
+    // Função para excluir uma venda
+    function deleteSale(event) {
+      var index = parseInt(event.target.getAttribute("data-index"));
+      sales.splice(index, 1);
+
+      updateSalesTable();
+    }
+
+    // Adicionar o evento de submit no formulário de criação
+    var createForm = document.getElementById("create-form");
+    createForm.addEventListener("submit", addSale);
+  </script>
+</body>
+</html>
