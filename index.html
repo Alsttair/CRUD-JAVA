@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  
   <title>CRUD de Vendas - Taylor Swift</title>
   <link href="style.css" rel="stylesheet">
-  
 </head>
 <body>
   <h1>CRUD de Vendas - Taylor Swift</h1>
@@ -48,5 +46,92 @@
   </div>
 
   <script src="script.js"></script>
+  <script>
+    // Evento de carregamento da página
+    document.addEventListener("DOMContentLoaded", function() {
+      // Função para buscar a lista de álbuns
+      function fetchAlbums() {
+        fetch("https://649a1d4a79fbe9bcf8404b5a.mockapi.io/users/20201214010018/products")
+          .then(response => response.json())
+          .then(albums => {
+            const albumList = document.getElementById("album-list");
+            albumList.innerHTML = "";
+
+            albums.forEach(album => {
+              const li = document.createElement("li");
+              li.innerHTML = `${album.title} - $${album.price}`;
+              albumList.appendChild(li);
+            });
+          })
+          .catch(error => console.log(error));
+      }
+
+      // Evento de envio do formulário para adicionar um álbum
+      const addAlbumForm = document.getElementById("add-album-form");
+      addAlbumForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+        const albumTitle = document.getElementById("album-title").value;
+        const albumPrice = document.getElementById("album-price").value;
+
+        fetch("https://649a1d4a79fbe9bcf8404b5a.mockapi.io/users/20201214010018/products", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ title: albumTitle, price: albumPrice })
+        })
+          .then(response => response.json())
+          .then(() => {
+            fetchAlbums();
+            addAlbumForm.reset();
+          })
+          .catch(error => console.log(error));
+      });
+
+      // Evento de envio do formulário para atualizar um álbum
+      const updateAlbumForm = document.getElementById("update-album-form");
+      updateAlbumForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+        const albumId = document.getElementById("update-album-id").value;
+        const albumTitle = document.getElementById("update-album-title").value;
+        const albumPrice = document.getElementById("update-album-price").value;
+
+        fetch(`https://649a1d4a79fbe9bcf8404b5a.mockapi.io/users/20201214010018/products/${albumId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ title: albumTitle, price: albumPrice })
+        })
+          .then(response => response.json())
+          .then(() => {
+            fetchAlbums();
+            updateAlbumForm.reset();
+          })
+          .catch(error => console.log(error));
+      });
+
+      // Evento de envio do formulário para excluir um álbum
+      const deleteAlbumForm = document.getElementById("delete-album-form");
+      deleteAlbumForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+        const albumId = document.getElementById("delete-album-id").value;
+
+        if (confirm("Tem certeza de que deseja excluir este álbum?")) {
+          fetch(`https://649a1d4a79fbe9bcf8404b5a.mockapi.io/users/20201214010018/products/${albumId}`, {
+            method: "DELETE"
+          })
+            .then(() => {
+              fetchAlbums();
+              deleteAlbumForm.reset();
+            })
+            .catch(error => console.log(error));
+        }
+      });
+
+      // Buscar a lista de álbuns ao carregar a página
+      fetchAlbums();
+    });
+  </script>
 </body>
 </html>
