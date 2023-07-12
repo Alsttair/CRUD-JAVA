@@ -1,80 +1,113 @@
-document.addEventListener("DOMContentLoaded", function() {
-  const albumList = document.getElementById("album-list");
-  const addAlbumForm = document.getElementById("add-album-form");
+// Função para buscar os produtos da API
+function getProducts() {
+  fetch("https://649a1d4a79fbe9bcf8404b5a.mockapi.io/users/20201214010018/products")
+    .then(response => response.json())
+    .then(data => {
+      const albumList = document.getElementById("album-list");
+      albumList.innerHTML = "";
 
-  // Função para buscar a lista de álbuns
-  function fetchAlbums() {
-    fetch("https://649a1d4a79fbe9bcf8404b5a.mockapi.io/users/20201214010018/products")
-      .then(response => response.json())
-      .then(albums => {
-        albumList.innerHTML = "";
-
-        albums.forEach(album => {
-          const li = document.createElement("li");
-          li.innerHTML = `
-            <span>${album.name} - $${album.price}</span>
-            <button onclick="editAlbum(${album.id})">Editar</button>
-            <button onclick="deleteAlbum(${album.id})">Excluir</button>
-          `;
-          albumList.appendChild(li);
-        });
-      })
-      .catch(error => console.log(error));
-  }
-
-  // Função para adicionar um álbum
-  function addAlbum(name, price) {
-    fetch("https://649a1d4a79fbe9bcf8404b5a.mockapi.io/users/20201214010018/products", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ name: name, price: price })
+      data.forEach(album => {
+        const listItem = document.createElement("li");
+        listItem.innerHTML = `<strong>ID:</strong> ${album.id}, <strong>Título:</strong> ${album.title}, <strong>Preço:</strong> ${album.price}`;
+        albumList.appendChild(listItem);
+      });
     })
-      .then(response => response.json())
-      .then(() => {
-        fetchAlbums();
-        addAlbumForm.reset();
-      })
-      .catch(error => console.log(error));
-  }
+    .catch(error => {
+      console.error("Erro ao buscar os produtos:", error);
+    });
+}
 
-  // Função para editar um álbum
-  function editAlbum(albumId) {
-    const newName = prompt("Digite o novo nome do álbum:");
-    const newPrice = prompt("Digite o novo preço do álbum:");
+// Função para adicionar um novo álbum
+function addAlbum(event) {
+  event.preventDefault();
 
-    fetch(`https://649a1d4a79fbe9bcf8404b5a.mockapi.io/users/20201214010018/products/${albumId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ name: newName, price: newPrice })
+  const albumTitleInput = document.getElementById("album-title");
+  const albumPriceInput = document.getElementById("album-price");
+
+  const album = {
+    title: albumTitleInput.value,
+    price: parseFloat(albumPriceInput.value)
+  };
+
+  fetch("https://649a1d4a79fbe9bcf8404b5a.mockapi.io/users/20201214010018/products", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(album)
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log("Álbum adicionado com sucesso:", data);
+      albumTitleInput.value = "";
+      albumPriceInput.value = "";
+      getProducts();
     })
-      .then(response => response.json())
-      .then(() => fetchAlbums())
-      .catch(error => console.log(error));
-  }
+    .catch(error => {
+      console.error("Erro ao adicionar o álbum:", error);
+    });
+}
 
-  // Função para excluir um álbum
-  function deleteAlbum(albumId) {
-    if (confirm("Tem certeza de que deseja excluir este álbum?")) {
-      fetch(`https://649a1d4a79fbe9bcf8404b5a.mockapi.io/users/20201214010018/products/${albumId}`, {
-        method: "DELETE"
-      })
-        .then(() => fetchAlbums())
-        .catch(error => console.log(error));
-    }
-  }
+// Função para atualizar um álbum
+function updateAlbum(event) {
+  event.preventDefault();
 
-  // Evento de envio do formulário para adicionar um álbum
-  addAlbumForm.addEventListener("submit", function(event) {
-    event.preventDefault();
-    const albumName = document.getElementById("album-name").value;
-    const albumPrice = document.getElementById("album-price").value;
-    addAlbum(albumName, albumPrice);
-  });
+  const albumIdInput = document.getElementById("update-album-id");
+  const albumTitleInput = document.getElementById("update-album-title");
+  const albumPriceInput = document.getElementById("update-album-price");
 
-  // Buscar a lista de álbuns ao carregar a página
-  fetchAlbums();
-});
+  const album = {
+    title: albumTitleInput.value,
+    price: parseFloat(albumPriceInput.value)
+  };
+
+  fetch(`https://649a1d4a79fbe9bcf8404b5a.mockapi.io/users/20201214010018/products/${albumIdInput.value}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(album)
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log("Álbum atualizado com sucesso:", data);
+      albumIdInput.value = "";
+      albumTitleInput.value = "";
+      albumPriceInput.value = "";
+      getProducts();
+    })
+    .catch(error => {
+      console.error("Erro ao atualizar o álbum:", error);
+    });
+}
+
+// Função para excluir um álbum
+function deleteAlbum(event) {
+  event.preventDefault();
+
+  const albumIdInput = document.getElementById("delete-album-id");
+
+  fetch(`https://649a1d4a79fbe9bcf8404b5a.mockapi.io/users/20201214010018/products/${albumIdInput.value}`, {
+    method: "DELETE"
+  })
+    .then(response => {
+      if (response.ok) {
+        console.log("Álbum excluído com sucesso");
+        albumIdInput.value = "";
+        getProducts();
+      } else {
+        throw new Error("Erro ao excluir o álbum");
+      }
+    })
+    .catch(error => {
+      console.error(error);
+    });
+}
+
+// Event Listeners
+document.getElementById("add-album-form").addEventListener("submit", addAlbum);
+document.getElementById("update-album-form").addEventListener("submit", updateAlbum);
+document.getElementById("delete-album-form").addEventListener("submit", deleteAlbum);
+
+// Carregar produtos ao carregar a página
+window.addEventListener("load", getProducts);
