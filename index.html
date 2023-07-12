@@ -1,50 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>CRUD de Vendas - Taylor Swift</title>
-  <link href="style.css" rel="stylesheet">
+  <title>CRUD de Vendas - Álbuns da Taylor Swift</title>
+  <link href="style.css" rel="stylesheet"><link href="style.css" rel="stylesheet">
 </head>
 <body>
-  <h1>CRUD de Vendas - Taylor Swift</h1>
+  <h1>CRUD de Vendas - Álbuns da Taylor Swift</h1>
 
-  <div>
-    <h2>Lista de Álbuns</h2>
-    <ul id="album-list"></ul>
-  </div>
+  <h2>Lista de Álbuns</h2>
+  <ul id="album-list"></ul>
 
-  <div>
-    <h2>Adicionar Novo Álbum</h2>
-    <form id="add-album-form">
-      <label for="album-title">Título:</label>
-      <input type="text" id="album-title" required><br>
-      <label for="album-price">Preço:</label>
-      <input type="number" id="album-price" required><br>
-      <button type="submit">Adicionar</button>
-    </form>
-  </div>
+  <h2>Adicionar Álbum</h2>
+  <form id="add-album-form">
+    <input type="text" id="album-name" placeholder="Nome do Álbum" required>
+    <input type="number" id="album-price" placeholder="Preço" required>
+    <button type="submit">Adicionar</button>
+  </form>
 
-  <div>
-    <h2>Atualizar Álbum</h2>
-    <form id="update-album-form">
-      <label for="update-album-id">ID:</label>
-      <input type="text" id="update-album-id" required><br>
-      <label for="update-album-title">Título:</label>
-      <input type="text" id="update-album-title" required><br>
-      <label for="update-album-price">Preço:</label>
-      <input type="number" id="update-album-price" required><br>
-      <button type="submit">Atualizar</button>
-    </form>
-  </div>
-
-  <div>
-    <h2>Excluir Álbum</h2>
-    <form id="delete-album-form">
-      <label for="delete-album-id">ID:</label>
-      <input type="text" id="delete-album-id" required><br>
-      <button type="submit">Excluir</button>
-    </form>
-  </div>
-
-  <script src="script.js"></script>
+  <script src="crud.js"></script>
 </body>
 </html>
